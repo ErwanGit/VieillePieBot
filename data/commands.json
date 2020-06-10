@@ -318,7 +318,7 @@
       {
         "storage": "1",
         "varName": "embed",
-        "message": "${tempVars(\"text\")}\n\n**Approuvez ce bon plan avec la commande `${tempVars(\"prefix\")}approuve ${tempVars(\"randomletters\")}` !**",
+        "message": "${tempVars(\"text\")}\n\n**Approuvez ce bon plan avec la commande `${tempVars(\"prefix\")}approuve ${tempVars(\"randomletters\")}` **ou** `${tempVars(\"prefix\")}deny ${tempVars(\"randomletters\")}` !**",
         "name": "Set Embed Description"
       },
       {
