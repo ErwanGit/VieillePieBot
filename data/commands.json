@@ -3,7 +3,7 @@
   {
     "name": "[CALL]CheckIfMod",
     "permissions": "NONE",
-    "restriction": "1",
+    "restriction": "0",
     "_id": "pztSJ",
     "actions": [
       {
@@ -19,7 +19,7 @@
       {
         "member": "1",
         "varName": "",
-        "info": "18",
+        "info": "21",
         "storage": "1",
         "varName2": "tag",
         "name": "Store Member Info"
@@ -27,7 +27,7 @@
       {
         "member": "1",
         "varName": "",
-        "info": "12",
+        "info": "16",
         "storage": "1",
         "varName2": "avatar",
         "name": "Store Member Info"
@@ -98,7 +98,7 @@
       {
         "member": "1",
         "varName": "",
-        "info": "12",
+        "info": "16",
         "storage": "1",
         "varName2": "avatar",
         "name": "Store Member Info"
@@ -106,7 +106,7 @@
       {
         "member": "1",
         "varName": "",
-        "info": "18",
+        "info": "21",
         "storage": "1",
         "varName2": "tag",
         "name": "Store Member Info"
@@ -294,11 +294,27 @@
         "name": "Jump to Anchor"
       },
       {
-        "title": "",
-        "author": "Nouveau bon plan proposé par ${tempVars(\"tag\")}",
+        "server": "0",
+        "varName": "",
+        "info": "2",
+        "storage": "1",
+        "varName2": "servername",
+        "name": "Store Server Info"
+      },
+      {
+        "server": "0",
+        "varName": "",
+        "info": "5",
+        "storage": "1",
+        "varName2": "servericon",
+        "name": "Store Server Info"
+      },
+      {
+        "title": "📰 Un nouveau bon plan a été publié !",
+        "author": "",
         "color": "9a785b",
         "url": "",
-        "authorIcon": "${tempVars(\"avatar\")}",
+        "authorIcon": "",
         "authorUrl": "",
         "imageUrl": "",
         "thumbUrl": "",
@@ -318,14 +334,14 @@
       {
         "storage": "1",
         "varName": "embed",
-        "message": "${tempVars(\"text\")}\n\n**Approuvez ce bon plan avec la commande `${tempVars(\"prefix\")}approuve ${tempVars(\"randomletters\")}` **ou** `${tempVars(\"prefix\")}deny ${tempVars(\"randomletters\")}` !**",
+        "message": "Un nouveau bon plan a été posté par ${member} pour la catégorie **${tempVars(\"category\")}** ! \nPour approuver ce bon plan, il vous suffit d'utiliser la commande `${tempVars(\"prefix\")}approuve ${tempVars(\"randomletters\")}` \nPour refuser ce bon plan, utiliser la commande `${tempVars(\"prefix\")}deny ${tempVars(\"randomletters\")}`\n\n>>> ${tempVars(\"text\")}\n\n",
         "name": "Set Embed Description"
       },
       {
         "storage": "1",
         "varName": "embed",
-        "message": "Catégorie: ${tempVars(\"category\")}",
-        "footerIcon": "",
+        "message": "${tempVars(\"servername\")}",
+        "footerIcon": "${tempVars(\"servericon\")}",
         "name": "Set Embed Footer"
       },
       {
@@ -446,7 +462,7 @@
       {
         "member": "1",
         "varName": "",
-        "info": "18",
+        "info": "21",
         "storage": "1",
         "varName2": "tag",
         "name": "Store Member Info"
@@ -454,7 +470,7 @@
       {
         "member": "1",
         "varName": "",
-        "info": "12",
+        "info": "16",
         "storage": "1",
         "varName2": "avatar",
         "name": "Store Member Info"
@@ -643,6 +659,7 @@
       },
       {
         "behavior": "0",
+        "varStorage": "1",
         "jsonObjectVarName": "file",
         "path": "$.member",
         "storage": "1",
@@ -651,6 +668,7 @@
       },
       {
         "behavior": "0",
+        "varStorage": "1",
         "jsonObjectVarName": "file",
         "path": "$.embedid",
         "storage": "1",
@@ -659,6 +677,7 @@
       },
       {
         "behavior": "0",
+        "varStorage": "1",
         "jsonObjectVarName": "file",
         "path": "$.category",
         "storage": "1",
@@ -673,6 +692,7 @@
       },
       {
         "behavior": "0",
+        "varStorage": "1",
         "jsonObjectVarName": "file",
         "path": "$.name",
         "storage": "1",
@@ -704,31 +724,31 @@
         "name": "Find Member"
       },
       {
-        "member": "2",
-        "varName": "member",
-        "info": "18",
+        "server": "0",
+        "varName": "",
+        "info": "5",
         "storage": "1",
-        "varName2": "membertag",
-        "name": "Store Member Info"
+        "varName2": "servericon",
+        "name": "Store Server Info"
       },
       {
-        "member": "2",
-        "varName": "member",
-        "info": "12",
+        "server": "0",
+        "varName": "",
+        "info": "2",
         "storage": "1",
-        "varName2": "memberavatar",
-        "name": "Store Member Info"
+        "varName2": "servername",
+        "name": "Store Server Info"
       },
       {
-        "title": "",
-        "author": "Nouveau bon plan de ${tempVars(\"membertag\")} !",
-        "color": "9a785b",
+        "title": "📰 Un nouveau bon plan a été publié !",
+        "author": "",
+        "color": "e6b15d",
         "url": "",
-        "authorIcon": "${tempVars(\"memberavatar\")}",
+        "authorIcon": "",
         "authorUrl": "",
         "imageUrl": "",
         "thumbUrl": "",
-        "timestamp": "false",
+        "timestamp": "true",
         "debug": "false",
         "text": "",
         "year": "",
@@ -744,8 +764,15 @@
       {
         "storage": "1",
         "varName": "embed",
-        "message": "${tempVars(\"bonplantxt\")}",
+        "message": "Ce bon plan vous est proposé par ${tempVars(\"member\")} !\n\n>>> ${tempVars(\"bonplantxt\")}",
         "name": "Set Embed Description"
+      },
+      {
+        "storage": "1",
+        "varName": "embed",
+        "message": "${tempVars(\"servername\")}",
+        "footerIcon": "${tempVars(\"servericon\")}",
+        "name": "Set Embed Footer"
       },
       {
         "storage": "1",
@@ -817,11 +844,11 @@
         "name": "Send Message"
       },
       {
-        "title": "",
-        "author": "Bon plan approuvé de ${tempVars(\"membertag\")}",
+        "title": "✅ Bon plan accepté !",
+        "author": "",
         "color": "55CC6E",
         "url": "",
-        "authorIcon": "${tempVars(\"memberavatar\")}",
+        "authorIcon": "",
         "authorUrl": "",
         "imageUrl": "",
         "thumbUrl": "",
@@ -841,14 +868,14 @@
       {
         "storage": "1",
         "varName": "embed",
-        "message": "${tempVars(\"bonplantxt\")}\n\n**Bon plan accepté par ${member} !**",
+        "message": "Ce bon plan a été accepté par ${member} pour la catégorie **${tempVars(\"category\")}** !\n\n>>> ${tempVars(\"bonplantxt\")}",
         "name": "Set Embed Description"
       },
       {
         "storage": "1",
         "varName": "embed",
-        "message": "Catégorie: ${tempVars(\"category\")}",
-        "footerIcon": "",
+        "message": "${tempVars(\"servername\")}",
+        "footerIcon": "${tempVars(\"servericon\")}",
         "name": "Set Embed Footer"
       },
       {
@@ -924,7 +951,7 @@
       {
         "member": "1",
         "varName": "",
-        "info": "18",
+        "info": "21",
         "storage": "1",
         "varName2": "tag",
         "name": "Store Member Info"
@@ -932,7 +959,7 @@
       {
         "member": "1",
         "varName": "",
-        "info": "12",
+        "info": "16",
         "storage": "1",
         "varName2": "avatar",
         "name": "Store Member Info"
@@ -1121,6 +1148,7 @@
       },
       {
         "behavior": "0",
+        "varStorage": "1",
         "jsonObjectVarName": "file",
         "path": "$.member",
         "storage": "1",
@@ -1129,6 +1157,7 @@
       },
       {
         "behavior": "0",
+        "varStorage": "1",
         "jsonObjectVarName": "file",
         "path": "$.embedid",
         "storage": "1",
@@ -1137,6 +1166,7 @@
       },
       {
         "behavior": "0",
+        "varStorage": "1",
         "jsonObjectVarName": "file",
         "path": "$.category",
         "storage": "1",
@@ -1154,20 +1184,20 @@
         "name": "Find Member"
       },
       {
-        "member": "2",
-        "varName": "member",
-        "info": "18",
+        "server": "0",
+        "varName": "",
+        "info": "2",
         "storage": "1",
-        "varName2": "membertag",
-        "name": "Store Member Info"
+        "varName2": "servername",
+        "name": "Store Server Info"
       },
       {
-        "member": "2",
-        "varName": "member",
-        "info": "12",
+        "server": "0",
+        "varName": "",
+        "info": "5",
         "storage": "1",
-        "varName2": "memberavatar",
-        "name": "Store Member Info"
+        "varName2": "servericon",
+        "name": "Store Server Info"
       },
       {
         "title": "Modération des bons plans",
@@ -1227,11 +1257,11 @@
         "name": "Send Message"
       },
       {
-        "title": "",
-        "author": "Bon plan refusé de ${tempVars(\"membertag\")}",
+        "title": ":x: Bon plan refusé !",
+        "author": "",
         "color": "dc423c",
         "url": "",
-        "authorIcon": "${tempVars(\"memberavatar\")}",
+        "authorIcon": "",
         "authorUrl": "",
         "imageUrl": "",
         "thumbUrl": "",
@@ -1251,14 +1281,14 @@
       {
         "storage": "1",
         "varName": "embed",
-        "message": "${tempVars(\"bonplantxt\")}\n\n**Bon plan refusé par ${member} !**",
+        "message": "Ce bon plan a été refusé par ${member} pour la catégorie **${tempVars(\"category\")}** !\n\n>>> ${tempVars(\"bonplantxt\")}\n",
         "name": "Set Embed Description"
       },
       {
         "storage": "1",
         "varName": "embed",
-        "message": "Catégorie: ${tempVars(\"category\")}",
-        "footerIcon": "",
+        "message": "${tempVars(\"servername\")}",
+        "footerIcon": "${tempVars(\"servericon\")}",
         "name": "Set Embed Footer"
       },
       {

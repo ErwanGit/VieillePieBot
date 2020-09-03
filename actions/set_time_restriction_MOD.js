@@ -1,304 +1,272 @@
 module.exports = {
+  name: 'Set Time Restriction',
+  section: 'Other Stuff',
 
-	//---------------------------------------------------------------------
-	// Action Name
-	//
-	// This is the name of the action displayed in the editor.
-	//---------------------------------------------------------------------
+  subtitle (data) {
+    const results = ['Continue Actions', 'Stop Action Sequence', 'Jump To Action', 'Jump Forward Actions', 'Jump to Anchor']
+    return `Cooldown | If True: ${results[parseInt(data.iftrue)]} ~ If False: ${results[parseInt(data.iffalse)]}`
+  },
 
-	name: "Set Time Restriction",
+  variableStorage (data, varType) {
+    const type = parseInt(data.storage)
+    if (type !== varType) return
+    return ([data.varName, 'Seconds'])
+  },
 
-	//---------------------------------------------------------------------
-	// Action Section
-	//
-	// This is the section the action will fall into.
-	//---------------------------------------------------------------------
+  fields: ['measurement', 'value', 'save', 'restrict', 'iftrue', 'iftrueVal', 'iffalse', 'iffalseVal', 'storage', 'varName'],
 
-	section: "Other Stuff",
+  html (isEvent, data) {
+    data.conditions[0] = data.conditions[0].replace(/If True/g, 'If Cooldown is Active').replace(/If False/g, 'If Cooldown is Not Active')
+    return `
+<div>
+  <div style="padding-top: 8px;">
+    <div style="float: left; width: 35%;">
+      Time Measurement:<br>
+      <select id="measurement" class="round" onchange="glob.onChange(this)">
+        <option value="0">Miliseconds</option>
+        <option value="1" selected>Seconds</option>
+        <option value="2">Minutes</option>
+        <option value="3">Hours</option>
+      </select>
+    </div>
+    <div style="padding-left: 5%; float: left; width: 65%;">
+      Cooldown Time:<br>
+      <input id="value" class="round" type="text" placeholder="1 = 1 second"><br>
+    </div>
+  </div><br><br><br>
+  <div style="padding-top: 8px;">
+    <div style="float: left; width: 35%;">
+      Reset After Restart:<br>
+      <select id="save" class="round"><br>
+        <option value="0" selected>False</option>
+        <option value="1">True</option>
+      </select>
+    </div>
+    <div style="padding-left: 5%; float: left; width: 59%;">
+      Restrict By:<br>
+      <select id="restrict" class="round"><br>
+        <option value="0" selected>Global</option>
+        <option value="1">Server</option>
+      </select>
+    </div>
+  </div><br><br><br>
+  <div style="padding-top: 8px;">
+    ${data.conditions[0]}
+  </div><br><br><br>
+  <div style="padding-top: 8px;">
+    <div style="float: left; width: 35%;">
+      Store Left Time In (s):<br>
+      <select id="storage" class="round" onchange="glob.variableChange(this, 'varNameContainer')">
+        ${data.variables[0]}
+      </select>
+    </div>
+    <div id="varNameContainer" style="float: right; width: 60%; display: none;">
+      Variable Name:<br>
+      <input id="varName" class="round" type="text"><br>
+    </div>
+  </div>
+</div>`
+  },
 
-	//---------------------------------------------------------------------
-	// Action Subtitle
-	//
-	// This function generates the subtitle displayed next to the name.
-	//---------------------------------------------------------------------
+  init () {
+    const { glob, document } = this
+    const value = document.getElementById('value')
+    glob.onChange = function (Measurement) {
+      switch (parseInt(Measurement.value)) {
+        case 0:
+          value.placeholder = '1000 = 1 second'
+          break
+        case 1:
+          value.placeholder = '1 = 1 second'
+          break
+        case 2:
+          value.placeholder = '1 = 60 seconds'
+          break
+        case 3:
+          value.placeholder = '1 = 3600 seconds'
+          break
+      }
+    }
+    const option = document.createElement('OPTION')
+    option.value = '4'
+    option.text = 'Jump to Anchor'
+    const iffalse = document.getElementById('iffalse')
+    if (iffalse.length === 4) {
+      iffalse.add(option)
+    }
+    const option2 = document.createElement('OPTION')
+    option2.value = '4'
+    option2.text = 'Jump to Anchor'
+    const iftrue = document.getElementById('iftrue')
+    if (iftrue.length === 4) {
+      iftrue.add(option2)
+    }
+    glob.onChangeTrue = function (event) {
+      switch (parseInt(event.value)) {
+        case 0:
+        case 1:
+          document.getElementById('iftrueContainer').style.display = 'none'
+          break
+        case 2:
+          document.getElementById('iftrueName').innerHTML = 'Action Number'
+          document.getElementById('iftrueContainer').style.display = null
+          break
+        case 3:
+          document.getElementById('iftrueName').innerHTML = 'Number of Actions to Skip'
+          document.getElementById('iftrueContainer').style.display = null
+          break
+        case 4:
+          document.getElementById('iftrueName').innerHTML = 'Anchor ID'
+          document.getElementById('iftrueContainer').style.display = null
+          break
+      }
+    }
+    glob.onChangeFalse = function (event) {
+      switch (parseInt(event.value)) {
+        case 0:
+        case 1:
+          document.getElementById('iffalseContainer').style.display = 'none'
+          break
+        case 2:
+          document.getElementById('iffalseName').innerHTML = 'Action Number'
+          document.getElementById('iffalseContainer').style.display = null
+          break
+        case 3:
+          document.getElementById('iffalseName').innerHTML = 'Number of Actions to Skip'
+          document.getElementById('iffalseContainer').style.display = null
+          break
+        case 4:
+          document.getElementById('iffalseName').innerHTML = 'Anchor ID'
+          document.getElementById('iffalseContainer').style.display = null
+          break
+      }
+    }
+    glob.variableChange(document.getElementById('storage'), 'varNameContainer')
+    glob.onChangeTrue(document.getElementById('iftrue'))
+    glob.onChangeFalse(document.getElementById('iffalse'))
+    glob.onChange(document.getElementById('Measurement'))
+  },
 
-	subtitle: function (data) {
+  action (cache) {
+    const data = cache.actions[cache.index]
+    const value = parseInt(this.evalMessage(data.value, cache))
+    if (isNaN(value)) {
+      console.error(`${value} is not a valid number.`)
+      return
+    }
+    let cmd
+    for (const command of this.getDBM().Files.data.commands) {
+      if (command && JSON.stringify(command.actions) === JSON.stringify(cache.actions)) {
+        cmd = command
+        break
+      }
+    }
+    const timeLeft = this.TimeRestriction(cache.msg, cmd, cache)
+    if (!timeLeft) {
+      this.executeResults(false, data, cache)
+    } else {
+      const storage = parseInt(data.storage)
+      const varName2 = this.evalMessage(data.varName, cache)
+      this.storeValue(timeLeft, storage, varName2, cache)
+      this.executeResults(true, data, cache)
+    }
+  },
 
-		let value = parseInt(data.value);
-		return `Command Cooldown: ${value} seconds`;
-	},
+  mod (DBM) {
+    let Cooldown
+    DBM.Actions.LoadTimeRestriction = function (cache) {
+      Cooldown = this.getVariable(3, 'DBMCooldown', cache)
+      if (typeof Cooldown === 'undefined') {
+        Cooldown = {}
+      } else if (typeof Cooldown === 'string') {
+        Cooldown = JSON.parse(Cooldown)
+      }
+      for (const command of Object.keys(Cooldown)) {
+        if (Cooldown[command].save === 1) {
+          delete Cooldown[command]
+        }
+        if (Cooldown[command]) {
+          if (!DBM.Bot.$cmds[command]) {
+            delete Cooldown[command]
+          } else {
+            const action = DBM.Bot.$cmds[command].actions.find(a => a.name === 'Set Time Restriction')
+            if (action !== undefined) {
+              if (action.save === '1') {
+                delete Cooldown[command]
+              }
+            } else {
+              delete Cooldown[command]
+            }
+          }
+        }
+      }
+    }
 
-	//---------------------------------------------------------------------
-	// DBM Mods Manager Variables (Optional but nice to have!)
-	//
-	// These are variables that DBM Mods Manager uses to show information
-	// about the mods for people to see in the list.
-	//---------------------------------------------------------------------
-
-	// Who made the mod (If not set, defaults to "DBM Mods")
-	author: "Aamon#9130",
-
-	// The version of the mod (Defaults to 1.0.0)
-	version: "1.9.5", //Added in 1.9.5
-
-	mod_version: "2",
-
-	// A short description to show on the mod line for this mod (Must be on a single line)
-	short_description: "This mod will restrict a command",
-
-	
-
-	//---------------------------------------------------------------------
-
-	//---------------------------------------------------------------------
-	// Action Storage Function
-	//
-	// Stores the relevant variable info for the editor.
-	//---------------------------------------------------------------------
-
-	//variableStorage: function (data, varType) {
-	//},
-
-
-
-
-
-
-	variableStorage: function (data, varType) {
-		const type = parseInt(data.storage);
-		if (type !== varType) return;
-		return ([data.varName]);
-	},
-
-
-	//---------------------------------------------------------------------
-	// Action Fields
-	//
-	// These are the fields for the action. These fields are customized
-	// by creating elements with corresponding IDs in the HTML. These
-	// are also the names of the fields stored in the action's JSON data.
-	//---------------------------------------------------------------------
-
-	fields: ["message", "value", "whattodo", "call", "storage", "varName", "source", "info"],
-
-	//---------------------------------------------------------------------
-	// Command HTML
-	//
-	// This function returns a string containing the HTML used for
-	// editting actions.
-	//
-	// The "isEvent" parameter will be true if this action is being used
-	// for an event. Due to their nature, events lack certain information,
-	// so edit the HTML to reflect this.
-	//
-	// The "data" parameter stores constants for select elements to use.
-	// Each is an array: index 0 for commands, index 1 for events.
-	// The names are: sendTargets, members, roles, channels,
-	//                messages, servers, variables
-	//---------------------------------------------------------------------
-
-	html: function (isEvent, data) {
-		return `
-	<div>
-		<div>
-			<p>
-			Made by <b>${this.author}</b>.<br>
-			With this MOD you can now to adjust command time restriction. 
-			</p>
-			
-		</div>
-		<div hidden style="float: left; width: 35%; padding-top: 20px;"> <<!-- todo: customized message-->
-			Warning Message<br>
-			<select id="message" class="round" onchange="glob.messageChange(this, 'varNameContainer')">
-				${data.messages[isEvent ? 1 : 0]}
-			</select>
-		</div>
-		
-		
-		<div style="float: left; width: 90%; padding-top: 15px;">
-			Time<br>
-			<input id="value" class="round" type="text" placeholder="Insert Seconds Here (eg: 60 -for 1 min)..."><br>
-		</div>
-
-		<div style="width: 35%; padding-top: 20px;">
-		If Cooldown is active: <br>
-		<select id="whattodo" class="round">
-			<option value="0">Jump to Action</option>
-			<option value="1">Skip Actions</option>
-			<option value="2">Do nothing</option>
-			<option value="3">Continue Actions</option>
-		</select>
-		</div>
-		<div style="width: 35%; padding-top: 20px;">
-		<input id="call" class="round" type="text">
-		</div>
-
-		<div>
-		<div style="float: left; width: 35%;  padding-top: 8px;">
-			Store Left Time In:<br>
-			<select id="storage" class="round" onchange="glob.variableChange(this, 'varNameContainer')">
-				${data.variables[0]}
-			</select>
-		</div>
-		<div id="varNameContainer" style="float: right; width: 60%; padding-top: 8px;">
-			Variable Name:<br>
-			<input id="varName" class="round" type="text"><br>
-		</div>
-		<div id="info" style="float: left; width: 75%; padding-top: 8px; ">
-			Command ID:<br>
-			<input id="source" class="round" type="text" placeholder="Insert Current Command ID(will be removed)...">
-		</div>
-
-	</div>
-
-	
-
-	</div>`
-	},
-
-	//---------------------------------------------------------------------
-	// Action Editor Init Code
-	//
-	// When the HTML is first applied to the action editor, this code
-	// is also run. This helps add modifications or setup reactionary
-	// functions for the DOM elements.
-	//---------------------------------------------------------------------
-
-	init: function () {
-
-		try {
-			const {
-				glob,
-				document
-			} = this;
-	
-
-			//todo: set visibility to none to do nothing/call/stop actions and stuff like this blablabla
-		} catch (err) {
-			console.log(err);
-		}
-	},
-
-	//---------------------------------------------------------------------
-	// Action Bot Function
-	//
-	// This is the function for the action within the Bot's Action class.
-	// Keep in mind event calls won't have access to the "msg" parameter,
-	// so be sure to provide checks for variable existance.
-	//---------------------------------------------------------------------
-
-	action: function (cache) {
-		const data = cache.actions[cache.index];
-
-		const Files = this.getDBM().Files;
-
-		const value = parseInt(data.value);
-		const message = parseInt(data.message);
-		const varName = this.evalMessage(data.varName, cache);
-		const msg = this.getMessage(message, varName, cache);
-		const whattodo = parseInt(data.whattodo);
-		const val = parseInt(this.evalMessage(data.call, cache));
-		const index = Math.max(val - 1, 0);
-		const index2 = cache.index + val + 1;
-		var _this = this;
-
-		let id = this.evalMessage(data.source, cache);
-
-
-		let cmd;
-		const allData = Files.data.commands;
-		for(let i = 0; i < allData.length; i++) {
-			if(allData[i] && allData[i]._id === id) {
-				cmd = allData[i];
-				break;
-			}
-		};
-
-		if(cmd == undefined || cmd == '') {return console.log('Please insert the current Command ID!')};
-
-
-
-		//in the future update----  member permission/ add to dbm editor (maybe yes, maybe not)
-		if (this.Cooldown(msg,cmd, value) === 1) {
-			//console.log("execute");
-			//and other stuff here if neded
-			this.callNextAction(cache);
-		} else {
-			
-			result = this.Cooldown(msg,cmd, value);
-			if (result !== undefined) {
-				const storage = parseInt(data.storage);
-				const varName2 = _this.evalMessage(data.varName, cache);
-				_this.storeValue(result, storage, varName2, cache);
-			};
-
-			switch (whattodo) {
-				case 0:
-					if (cache.actions[index]) {
-						cache.index = index - 1;
-						this.callNextAction(cache);
-					};
-					break;
-				case 1:
-					if (cache.actions[index2]) {
-						cache.index = index2 - 1;
-						this.callNextAction(cache);
-					};
-					break;
-				case 2:
-					break;
-				case 3:
-					this.callNextAction(cache);
-					break;
-				default:
-				break;
-
-			}
-
-			
-
-			// msg.delete(); //delete author command message 
-			//msg.reply(`please cool down! (**${value}** seconds left)`);
-		}
-
-
-	},
-
-	//---------------------------------------------------------------------
-	// Action Bot Mod
-	//
-	// Upon initialization of the bot, this code is run. Using the bot's
-	// DBM namespace, one can add/modify existing functions if necessary.
-	// In order to reduce conflictions between mods, be sure to alias
-	// functions you wish to overwrite.
-	//---------------------------------------------------------------------
-
-	mod: function (DBM) {
-
-		let userCooldown = {};
-		let userTimeRemaining = {};
-		var currentTime;
-		DBM.Actions.Cooldown = function (msg, cmd, value) {
-
-			
-			const ceva = cmd._id.concat(msg.author.id); //why? why not? results =299419528631531091rBBaV a unique author-command-id :wink:x	
-
-			if (userCooldown[ceva]) { // member has time restrict
-				//msg.reply("you cannot use this command")
-				//userCooldown[msg.author.id] = false; 
-				currentTime = userTimeRemaining[ceva] - Math.round(new Date() /1000);
-				return currentTime;
-			} else //member can use the command
-			{
-				//msg.reply(`you can use this command`); //execute command or something like that
-				userCooldown[ceva] = true;
-				userTimeRemaining[ceva] = Math.round(new Date() / 1000) + value ;
-				setTimeout(() => {
-					userCooldown[ceva] = false;
-				}, value * 1000)
-				return 1;
-			}
-		};
-	}
-
-}; // End of module
+    DBM.Actions.TimeRestriction = function (msg, cmd, cache) {
+      if (typeof Cooldown === 'undefined') {
+        this.LoadTimeRestriction(cache)
+      }
+      const { Files } = DBM
+      let value = parseInt(this.evalMessage(cache.actions[cache.index].value, cache))
+      const measurement = parseInt(cache.actions[cache.index].measurement)
+      const restrict = parseInt(cache.actions[cache.index].restrict)
+      switch (measurement) {
+        case 1:
+          value *= 1000
+          break
+        case 2:
+          value *= 60000
+          break
+        case 3:
+          value *= 3600000
+      }
+      if (!Cooldown[cmd.name]) {
+        Cooldown[cmd.name] = {}
+      }
+      Cooldown[cmd.name].save = parseInt(cache.actions[cache.index].save)
+      Cooldown[cmd.name].cooldown = value
+      const now = Date.now()
+      switch (restrict) {
+        case 0:
+          if (typeof Cooldown[cmd.name][msg.author.id] !== 'number') {
+            delete Cooldown[cmd.name][msg.author.id]
+          }
+          if (Cooldown[cmd.name][msg.author.id]) {
+            const expirationTime = Cooldown[cmd.name][msg.author.id] + Cooldown[cmd.name].cooldown
+            if (now < expirationTime) {
+              return Math.ceil((expirationTime - now) / 1000)
+            }
+            Cooldown[cmd.name][msg.author.id] = now
+            if (Cooldown[cmd.name].save === 0) Files.saveGlobalVariable('DBMCooldown', JSON.stringify(Cooldown))
+            return false
+          }
+          Cooldown[cmd.name][msg.author.id] = now
+          if (Cooldown[cmd.name].save === 0) Files.saveGlobalVariable('DBMCooldown', JSON.stringify(Cooldown))
+          return false
+        case 1: {
+          let channelId
+          if (typeof cache.server !== 'undefined') {
+            channelId = cache.server.id
+          } else {
+            channelId = msg.channel.id
+          }
+          if (typeof Cooldown[cmd.name][msg.author.id] !== 'object') {
+            Cooldown[cmd.name][msg.author.id] = {}
+          }
+          if (Cooldown[cmd.name][msg.author.id][channelId]) {
+            const expirationTime = Cooldown[cmd.name][msg.author.id][channelId] + Cooldown[cmd.name].cooldown
+            if (now < expirationTime) {
+              return Math.ceil((expirationTime - now) / 1000)
+            }
+            Cooldown[cmd.name][msg.author.id][channelId] = now
+            if (Cooldown[cmd.name].save === 0) Files.saveGlobalVariable('DBMCooldown', JSON.stringify(Cooldown))
+            return false
+          }
+          Cooldown[cmd.name][msg.author.id][channelId] = now
+          if (Cooldown[cmd.name].save === 0) Files.saveGlobalVariable('DBMCooldown', JSON.stringify(Cooldown))
+          return false
+        }
+      }
+    }
+  }
+}
