@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+      "baseUrl": "./src",
+      "target": "esnext",
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "declaration": true,
+      "pretty": true,
+      "noEmitOnError": true,
+      "strict": true,
+      "resolveJsonModule": true,
+      "esModuleInterop": true,
+      "removeComments": true,
+      "newLine": "lf",
+      "noUnusedLocals": true,
+      "noFallthroughCasesInSwitch": true,
+      "useDefineForClassFields": true,
+      "forceConsistentCasingInFileNames": true,
+      "skipLibCheck": true,
+      "outDir": "./dist",
+      "lib": ["esnext"],
+    }
+  }

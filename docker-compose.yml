@@ -1,0 +1,19 @@
+version: '3'
+services:
+  bot:
+    container_name: vp_bot
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    tty: true
+    env_file:
+      - ./.env
+    environment:
+      - token=${prod_token}
+      - env_type=production
+    networks:
+      - global
+
+networks:
+  global:
