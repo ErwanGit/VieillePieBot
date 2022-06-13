@@ -2,10 +2,14 @@ import Bot from '../Bot';
 
 import got from 'got';
 import dayjs from 'dayjs';
-import { TextChannel, Guild, GuildMember } from 'discord.js';
+import type { TextChannel, Guild, GuildMember } from 'discord.js';
+import type { APIEmbed } from 'discord-api-types/v10';
 
 import fetes from '../assets/fetes.json';
+import weatherLocation from '../assets/msgtoday/location.json';
 import { guildId, msgTodayChannel, birthdayRole } from '../utils/constants';
+
+import { registerFont, createCanvas, loadImage } from 'canvas';
 
 type monthType =
     | 'janvier'
@@ -53,14 +57,45 @@ type dayType =
     | '30'
     | '31';
 
+interface NewsInterface {
+    articles: ArticleInterface[];
+}
+
 interface ArticleInterface {
     title: string;
     url: string;
 }
 
-interface NewsInterface {
-    articles: ArticleInterface[];
+interface CityData {
+    cityID: number;
+    x: number;
+    y: number;
 }
+
+interface WeatherData {
+    main: { temp: number };
+    weather: [{ icon: WeatherIcon }];
+}
+
+type WeatherIcon =
+    | '01d'
+    | '01n'
+    | '02d'
+    | '02n'
+    | '03d'
+    | '03n'
+    | '04d'
+    | '04n'
+    | '09d'
+    | '09n'
+    | '10d'
+    | '10n'
+    | '11d'
+    | '11n'
+    | '13d'
+    | '13n'
+    | '50d'
+    | '50n';
 
 export default class MessageTodayManager {
     public client: Bot;
@@ -70,6 +105,8 @@ export default class MessageTodayManager {
     }
 
     public async init() {
+        registerFont('./src/assets/fonts/Roboto-Bold.ttf', { family: 'Roboto' });
+
         this.run();
         // scheduleJob('0 * * * *', async () => {
         //     await this.run();
@@ -87,6 +124,7 @@ export default class MessageTodayManager {
         if (!channel) return;
 
         const birthdayMembers = await this._getBirthdayMembers(guild);
+        const weatherImage = await this._generateImage();
 
         return channel.send({
             embeds: [
@@ -111,16 +149,20 @@ export default class MessageTodayManager {
                             inline: true
                         }
                     ],
-                    color: 0x5865f2
+                    color: 0x5865f2,
+                    timestamp: !birthdayMembers && new Date().toISOString(),
+                    footer: !birthdayMembers && { text: guild.name, icon_url: guild.iconURL() ?? undefined },
+                    image: { url: 'attachment://weather.png' }
                 },
                 birthdayMembers && {
                     title: '🎉 Anniversaire',
                     description: `Souhaitez un joyeux anniversaire à ${birthdayMembers}.`,
                     color: 0xea45bc,
-                    timestamp: Date.now(),
-                    footer: { text: guild.name, icon_url: guild.iconURL() }
+                    timestamp: new Date().toISOString(),
+                    footer: { text: guild.name, icon_url: guild.iconURL() ?? undefined }
                 }
-            ].filter(Boolean)
+            ].filter(Boolean) as APIEmbed[],
+            files: [{ attachment: weatherImage, name: 'weather.png' }]
         });
     }
 
@@ -140,10 +182,11 @@ export default class MessageTodayManager {
     private async _fetchNews(topic: 'world' | 'technology') {
         try {
             const { articles } = await got(
-                `https://gnews.io/api/v4/top-headlines?token=${process.env.gnewsToken}&topic=${topic}&lang=fr&country=fr,ch,ca&max=3`
+                `https://gnews.io/api/v4/top-headlines?token=${process.env.gnews_token}&topic=${topic}&lang=fr&country=fr,ch,ca&max=3`
             ).json<NewsInterface>();
             return articles;
-        } catch {
+        } catch (error) {
+            // console.error(error)
             return null;
         }
     }
@@ -154,9 +197,64 @@ export default class MessageTodayManager {
         const members = await guild.members.fetch();
         const birthdayMembers = members.filter((member: GuildMember) => member.roles.cache.has(birthdayRole));
 
-        // @ts-expect-error La propriété 'ListFormat' n'existe pas sur le type 'typeof Intl'
         return new Intl.ListFormat('fr', { type: 'conjunction' }).format(
-            birthdayMembers.map((member) => member.toString())
-        ) as string;
+            birthdayMembers.map((member: GuildMember) => member.toString())
+        );
+    }
+
+    private async _generateImage() {
+        const canvas = createCanvas(2048, 1365);
+        const context = canvas.getContext('2d');
+
+        context.font = '60px Roboto';
+        context.fillStyle = '#ffffff';
+
+        const backgroundImage = await loadImage('./src/assets/msgtoday/carte.png');
+        const weatherIcons = {
+            '01d': await loadImage('./src/assets/msgtoday/icons/01d.png'),
+            '01n': await loadImage('./src/assets/msgtoday/icons/01n.png'),
+            '02d': await loadImage('./src/assets/msgtoday/icons/02d.png'),
+            '02n': await loadImage('./src/assets/msgtoday/icons/02n.png'),
+            '03d': await loadImage('./src/assets/msgtoday/icons/03d.png'),
+            '03n': await loadImage('./src/assets/msgtoday/icons/03n.png'),
+            '04d': await loadImage('./src/assets/msgtoday/icons/04d.png'),
+            '04n': await loadImage('./src/assets/msgtoday/icons/04n.png'),
+            '09d': await loadImage('./src/assets/msgtoday/icons/09d.png'),
+            '09n': await loadImage('./src/assets/msgtoday/icons/09n.png'),
+            '10d': await loadImage('./src/assets/msgtoday/icons/10d.png'),
+            '10n': await loadImage('./src/assets/msgtoday/icons/10n.png'),
+            '11d': await loadImage('./src/assets/msgtoday/icons/11d.png'),
+            '11n': await loadImage('./src/assets/msgtoday/icons/11n.png'),
+            '13d': await loadImage('./src/assets/msgtoday/icons/13d.png'),
+            '13n': await loadImage('./src/assets/msgtoday/icons/13n.png'),
+            '50d': await loadImage('./src/assets/msgtoday/icons/11d.png'),
+            '50n': await loadImage('./src/assets/msgtoday/icons/50n.png')
+        };
+
+        context.drawImage(backgroundImage, 0, 0, 2048, 1365);
+
+        const weatherLocations: Array<[string, CityData]> = Object.entries(weatherLocation);
+        for (const [city, value] of weatherLocations) {
+            console.log(`Carte > ${city}`);
+            const weatherData = await this._getWeatherData(value.cityID);
+            if (weatherData) {
+                context.fillText(`${Math.round(weatherData.main.temp)}°C`, value.x, value.y);
+                context.drawImage(weatherIcons[weatherData.weather[0].icon], value.x + 25, value.y);
+            }
+        }
+
+        return canvas.toBuffer('image/png', { compressionLevel: 6 });
+    }
+
+    private async _getWeatherData(cityId: number) {
+        try {
+            const data = got(
+                `https://api.openweathermap.org/data/2.5/weather?id=${cityId}&APPID=${process.env.weather_token}&lang=fr&units=metric`
+            ).json<WeatherData>();
+            return data;
+        } catch (error) {
+            // console.error(error)
+            return null;
+        }
     }
 }
