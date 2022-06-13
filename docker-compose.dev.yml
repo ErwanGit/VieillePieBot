@@ -1,0 +1,24 @@
+version: '3'
+services:
+  bot:
+    container_name: vp_bot_dev
+    build:
+      context: ./
+      dockerfile: ./docker/Dockerfile.dev
+    tty: true
+    volumes:
+      - ./src:/app/src
+    env_file:
+      - ./.env
+    environment:
+      - token=${dev_token}
+      - env_type=development
+      - TZ=Europe/Paris
+    networks:
+      - global_dev
+
+volumes:
+  data:
+
+networks:
+  global_dev:

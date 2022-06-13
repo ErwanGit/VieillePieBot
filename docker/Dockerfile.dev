@@ -1,0 +1,16 @@
+FROM node:16.9
+WORKDIR /app
+
+COPY --chown=node:node package*.json ./
+COPY --chown=node:node tsconfig.json ./
+
+RUN npm install
+
+COPY --chown=node:node ./src ./src
+COPY --chown=node:node .env .
+
+COPY . .
+
+RUN mkdir dist
+
+CMD npx tsc-watch --onSuccess "node dist/index.js"
