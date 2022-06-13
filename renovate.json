@@ -1,5 +1,47 @@
 {
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "description": "Renovate config",
     "extends": [
-        "config:base"
-    ]
+        "config:base",
+        "helpers:pinGitHubActionDigests",
+        "group:allNonMajor"
+    ],
+    "schedule": [
+        "after 7am on the first day of the month"
+    ],
+    "baseBranches": [
+        "master"
+    ],
+    "prConcurrentLimit": 3,
+    "rangeStrategy": "bump",
+    "npm": {
+        "labels": [
+            "dependencies"
+        ],
+        "assignees": [
+            "ErwanGit"
+        ],
+        "packageRules": [
+            {
+                "matchUpdateTypes": [
+                    "minor",
+                    "patch"
+                ],
+                "matchCurrentVersion": "!/^0/",
+                "automerge": true
+            },
+            {
+                "matchPackagePatterns": [
+                    "eslint",
+                    "prettier",
+                    "commitlint",
+                    "lint-staged"
+                ],
+                "groupName": "Devtools Dependencies"
+            }
+        ]
+    },
+    "lockFileMaintenance": {
+        "enabled": true
+    }
 }
