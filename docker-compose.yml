@@ -12,6 +12,7 @@ services:
     environment:
       - token=${prod_token}
       - env_type=production
+      - TZ=Europe/Paris
     networks:
       - global
 

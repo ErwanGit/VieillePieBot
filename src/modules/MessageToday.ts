@@ -2,6 +2,7 @@ import Bot from '../Bot';
 
 import got from 'got';
 import dayjs from 'dayjs';
+import { schedule } from 'node-cron';
 import type { TextChannel, Guild, GuildMember } from 'discord.js';
 import type { APIEmbed } from 'discord-api-types/v10';
 
@@ -107,10 +108,9 @@ export default class MessageTodayManager {
     public async init() {
         registerFont('./src/assets/fonts/Roboto-Bold.ttf', { family: 'Roboto' });
 
-        this.run();
-        // scheduleJob('0 * * * *', async () => {
-        //     await this.run();
-        // });
+        schedule('0 7 * * *', async () => {
+            await this.run();
+        });
     }
 
     public async run() {

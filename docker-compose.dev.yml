@@ -13,6 +13,7 @@ services:
     environment:
       - token=${dev_token}
       - env_type=development
+      - TZ=Europe/Paris
     networks:
       - global_dev
 
