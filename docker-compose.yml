@@ -10,7 +10,6 @@ services:
     env_file:
       - ./.env
     environment:
-      - token=${prod_token}
       - env_type=production
       - TZ=Europe/Paris
     networks:
