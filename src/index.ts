@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 
 dotenv.config({
-    path: '@/../.env',
+    path: '.env',
     encoding: 'utf8',
     debug: false
 });

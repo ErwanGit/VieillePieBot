@@ -183,11 +183,18 @@ export default class MessageTodayManager {
     private async _fetchNews(topic: 'world' | 'technology') {
         try {
             const { articles } = await got(
-                `https://gnews.io/api/v4/top-headlines?token=${process.env.gnews_token}&topic=${topic}&lang=fr&country=fr,ch,ca&max=3`
+                `https://gnews.io/api/v4/top-headlines?token=${process.env.gnews_token}&topic=${topic}&lang=fr&country=fr,ch,ca&max=5`
             ).json<NewsInterface>();
-            return articles;
+
+            const filtredArticles: Array<ArticleInterface> = [];
+            for (const article of articles) {
+                if (!filtredArticles.find((art) => article.title === art.title)) {
+                    filtredArticles.push(article);
+                }
+            }
+            return filtredArticles.slice(0, 3);
         } catch (error) {
-            console.error(error)
+            console.error(error);
             return null;
         }
     }
@@ -254,7 +261,7 @@ export default class MessageTodayManager {
             ).json<WeatherData>();
             return data;
         } catch (error) {
-            console.error(error)
+            console.error(error);
             return null;
         }
     }
