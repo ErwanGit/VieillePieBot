@@ -108,6 +108,7 @@ export default class MessageTodayManager {
     public async init() {
         registerFont('./src/assets/fonts/Roboto-Bold.ttf', { family: 'Roboto' });
 
+        // At 7am
         schedule('0 7 * * *', async () => {
             await this.run();
         });
@@ -186,7 +187,7 @@ export default class MessageTodayManager {
             ).json<NewsInterface>();
             return articles;
         } catch (error) {
-            // console.error(error)
+            console.error(error)
             return null;
         }
     }
@@ -253,7 +254,7 @@ export default class MessageTodayManager {
             ).json<WeatherData>();
             return data;
         } catch (error) {
-            // console.error(error)
+            console.error(error)
             return null;
         }
     }

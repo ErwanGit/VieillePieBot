@@ -20,4 +20,4 @@
       "outDir": "./dist",
       "lib": ["esnext"],
     }
-  }
+}

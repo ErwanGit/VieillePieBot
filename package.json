@@ -37,7 +37,7 @@
     "discord.js": "^14.0.0-dev.1654949087-96053ba",
     "dotenv": "^16.0.1",
     "got": "^11.8.3",
-    "node-cron": "^3.0.1"
+    "node-cron": "3.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.17.8",
