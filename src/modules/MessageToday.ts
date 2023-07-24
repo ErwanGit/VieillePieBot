@@ -107,7 +107,6 @@ export default class MessageTodayManager {
     }
 
     public async init() {
-        console.log(path.join(__dirname, '../assets/fonts/Roboto-Bold.ttf'));
         registerFont(path.join(__dirname, '../assets/fonts/Roboto-Bold.ttf'), { family: 'Roboto' });
 
         // At 7am
