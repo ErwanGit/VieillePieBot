@@ -14,5 +14,6 @@ COPY --chown=node:node tsconfig.json ./
 RUN npx tsc
 
 COPY --chown=node:node .env .
+COPY --chown=node:node ./src/assets ./dist/assets
 
 CMD node dist/index.js

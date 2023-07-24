@@ -10,6 +10,7 @@ import weatherLocation from '../assets/msgtoday/location.json';
 import { birthdayRole, guildId, msgTodayChannel } from '../utils/constants';
 
 import { createCanvas, loadImage, registerFont } from 'canvas';
+import path from 'path';
 
 type monthType =
     | 'janvier'
@@ -105,7 +106,7 @@ export default class MessageTodayManager {
     }
 
     public async init() {
-        registerFont('./src/assets/fonts/Roboto-Bold.ttf', { family: 'Roboto' });
+        registerFont(path.join(__dirname, '../assets/fonts/Roboto-Bold.ttf'), { family: 'Roboto' });
 
         // At 7am
         scheduleJob('0 7 * * *', async () => {
