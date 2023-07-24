@@ -1,28 +1,18 @@
-FROM node:16.15 as base
+FROM node:18.17-buster-slim as base
+
 WORKDIR /app
 
-COPY --chown=node:node package*.json ./
-COPY --chown=node:node tsconfig.json ./
+ENV TZ Europe/Paris
 
-RUN npm set-script prepare ""
+COPY --chown=node:node package.json yarn.lock ./
 
-FROM base as builder
-
-RUN npm install --save-dev
+RUN yarn install
 
 COPY --chown=node:node ./src ./src
-COPY --chown=node:node .env .
+COPY --chown=node:node tsconfig.json ./
 
 RUN npx tsc
 
-FROM base as production
-
-RUN npm ci
-
-COPY --from=builder --chown=node:node /app/dist ./dist
-
-ENV NODE_ENV=production
-
-USER node
+COPY --chown=node:node .env .
 
 CMD node dist/index.js

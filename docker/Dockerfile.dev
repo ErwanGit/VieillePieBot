@@ -1,16 +1,31 @@
-FROM node:16.15
+FROM node:18.17-buster-slim as base
+
+ARG BUILDARCH
+
 WORKDIR /app
 
-COPY --chown=node:node package*.json ./
+ENV TZ Europe/Paris
+
+FROM base AS node-amd64
+
+RUN apt-get update && \
+    apt-get upgrade -y --no-install-recommends && \
+    apt-get install -y --no-install-recommends ca-certificates build-essential python3 fontconfig ttf-bitstream-vera dumb-init
+
+FROM base AS node-arm64
+
+RUN apt-get update && \
+    apt-get upgrade -y --no-install-recommends && \
+    apt-get install -y --no-install-recommends ca-certificates build-essential python3 fontconfig ttf-bitstream-vera dumb-init libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+
+FROM node-${BUILDARCH} AS final
+
+COPY --chown=node:node package.json yarn.lock ./
 COPY --chown=node:node tsconfig.json ./
 
-RUN npm install
+RUN yarn install
 
 COPY --chown=node:node ./src ./src
 COPY --chown=node:node .env .
-
-COPY . .
-
-RUN mkdir dist
 
 CMD npx tsc-watch --onSuccess "node dist/index.js"
