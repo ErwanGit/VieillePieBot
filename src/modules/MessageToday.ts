@@ -12,7 +12,7 @@ import { birthdayRole, guildId, msgTodayChannel } from '../utils/constants';
 import { createCanvas, loadImage, registerFont } from 'canvas';
 import path from 'path';
 
-type monthType =
+type MonthType =
     | 'janvier'
     | 'février'
     | 'mars'
@@ -25,7 +25,8 @@ type monthType =
     | 'octobre'
     | 'novembre'
     | 'décembre';
-type dayType =
+
+type DayType =
     | '1'
     | '2'
     | '3'
@@ -169,8 +170,8 @@ export default class MessageTodayManager {
 
     private _getTodayFete() {
         const todayData = dayjs();
-        const currentMonth = todayData.format('MMMM') as monthType;
-        const currentDay = todayData.format('D') as dayType;
+        const currentMonth = todayData.format('MMMM') as MonthType;
+        const currentDay = todayData.format('D') as DayType;
         return holidays[currentMonth][currentDay];
     }
 
