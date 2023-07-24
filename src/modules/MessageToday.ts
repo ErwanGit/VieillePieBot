@@ -1,16 +1,15 @@
 import Bot from '../Bot';
 
-import got from 'got';
 import dayjs from 'dayjs';
-import { schedule } from 'node-cron';
-import type { TextChannel, Guild, GuildMember } from 'discord.js';
 import type { APIEmbed } from 'discord-api-types/v10';
+import type { Guild, GuildMember, TextChannel } from 'discord.js';
+import { scheduleJob } from 'node-schedule';
 
-import fetes from '../assets/fetes.json';
+import holidays from '../assets/holidays.json';
 import weatherLocation from '../assets/msgtoday/location.json';
-import { guildId, msgTodayChannel, birthdayRole } from '../utils/constants';
+import { birthdayRole, guildId, msgTodayChannel } from '../utils/constants';
 
-import { registerFont, createCanvas, loadImage } from 'canvas';
+import { createCanvas, loadImage, registerFont } from 'canvas';
 
 type monthType =
     | 'janvier'
@@ -109,7 +108,7 @@ export default class MessageTodayManager {
         registerFont('./src/assets/fonts/Roboto-Bold.ttf', { family: 'Roboto' });
 
         // At 7am
-        schedule('0 7 * * *', async () => {
+        scheduleJob('0 7 * * *', async () => {
             await this.run();
         });
     }
@@ -171,7 +170,7 @@ export default class MessageTodayManager {
         const todayData = dayjs();
         const currentMonth = todayData.format('MMMM') as monthType;
         const currentDay = todayData.format('D') as dayType;
-        return fetes[currentMonth][currentDay];
+        return holidays[currentMonth][currentDay];
     }
 
     private async _getNews() {
@@ -182,9 +181,10 @@ export default class MessageTodayManager {
 
     private async _fetchNews(topic: 'world' | 'technology') {
         try {
-            const { articles } = await got(
+            const response = await fetch(
                 `https://gnews.io/api/v4/top-headlines?token=${process.env.gnews_token}&topic=${topic}&lang=fr&country=fr,ch,ca&max=5`
-            ).json<NewsInterface>();
+            );
+            const { articles }= await response.json() as NewsInterface;
 
             const filtredArticles: Array<ArticleInterface> = [];
             for (const article of articles) {
@@ -256,10 +256,10 @@ export default class MessageTodayManager {
 
     private async _getWeatherData(cityId: number) {
         try {
-            const data = got(
+            const response = await fetch(
                 `https://api.openweathermap.org/data/2.5/weather?id=${cityId}&APPID=${process.env.weather_token}&lang=fr&units=metric`
-            ).json<WeatherData>();
-            return data;
+            );
+            return response.json() as Promise<WeatherData>;
         } catch (error) {
             console.error(error);
             return null;
