@@ -13,7 +13,7 @@ ENV TZ Europe/Paris
 
 COPY --chown=node:node package.json yarn.lock ./
 
-RUN yarn install
+RUN yarn install --production=true
 
 COPY --chown=node:node ./src ./src
 COPY --chown=node:node tsconfig.json ./

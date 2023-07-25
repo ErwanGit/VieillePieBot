@@ -109,7 +109,7 @@ export default class MessageTodayManager {
     public async init() {
         registerFont(path.join(__dirname, '../assets/fonts/Roboto-Bold.ttf'), { family: 'Roboto' });
 
-        // At 7am
+        // At 7h00
         scheduleJob('0 7 * * *', async () => {
             await this.run();
         });
@@ -117,7 +117,7 @@ export default class MessageTodayManager {
 
     public async run() {
         const { globalNews, techNews } = await this._getNews();
-        const todayFete = this._getTodayFete();
+        const todayFete = this._getTodayHoliday();
 
         const guild = this.client.guilds.cache.get(guildId);
         if (!guild) return;
@@ -168,7 +168,7 @@ export default class MessageTodayManager {
         });
     }
 
-    private _getTodayFete() {
+    private _getTodayHoliday() {
         const todayData = dayjs();
         const currentMonth = todayData.format('MMMM') as MonthType;
         const currentDay = todayData.format('D') as DayType;
