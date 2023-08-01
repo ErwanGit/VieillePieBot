@@ -20,7 +20,7 @@ type MonthType =
     | 'mai'
     | 'juin'
     | 'juillet'
-    | 'aout'
+    | 'août'
     | 'septembre'
     | 'octobre'
     | 'novembre'
