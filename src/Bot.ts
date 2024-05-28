@@ -22,6 +22,7 @@ export default class VieillePieBot extends Client {
     this.on('messageCreate', async (message) => {
       if (message.author.id !== devId) return;
 
+      console.log(message.content, `<@${message.client.user.id}> msgtoday`);
       if (message.content === `<@${message.client.user.id}> msgtoday`) {
         await message.react('✅');
         return this.msgTodayManager.run();
