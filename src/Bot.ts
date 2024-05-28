@@ -1,4 +1,5 @@
 import { Client, IntentsBitField } from 'discord.js';
+import { devId } from 'utils/constants';
 import MessageTodayManager from './modules/MessageToday';
 
 export default class VieillePieBot extends Client {
@@ -16,6 +17,15 @@ export default class VieillePieBot extends Client {
       console.log(`[${client.user.username}] Bot connecté !`);
 
       this.msgTodayManager.init();
+    });
+
+    this.on('messageCreate', async (message) => {
+      if (message.author.id !== devId) return;
+
+      if (message.content === `<@${message.client.user.id}> msgtoday`) {
+        await message.react('✅');
+        return this.msgTodayManager.run();
+      }
     });
   }
 }
