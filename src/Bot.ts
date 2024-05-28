@@ -1,6 +1,6 @@
 import { Client, IntentsBitField } from 'discord.js';
-import { devId } from 'utils/constants';
 import MessageTodayManager from './modules/MessageToday';
+import { devId } from './utils/constants';
 
 export default class VieillePieBot extends Client {
   public msgTodayManager: MessageTodayManager;
