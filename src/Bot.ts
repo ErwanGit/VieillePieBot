@@ -8,7 +8,7 @@ export default class VieillePieBot extends Client {
   constructor() {
     super({
       presence: { status: 'online' },
-      intents: IntentsBitField.Flags.Guilds | IntentsBitField.Flags.GuildMembers
+      intents: IntentsBitField.Flags.Guilds | IntentsBitField.Flags.GuildMembers | IntentsBitField.Flags.GuildMessages
     });
 
     this.msgTodayManager = new MessageTodayManager(this);
@@ -20,6 +20,7 @@ export default class VieillePieBot extends Client {
     });
 
     this.on('messageCreate', async (message) => {
+      console.log('messageCreate', message.content, message.author.id, devId);
       if (message.author.id !== devId) return;
 
       console.log(message.content, `<@${message.client.user.id}> msgtoday`);
