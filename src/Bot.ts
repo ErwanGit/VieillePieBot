@@ -8,7 +8,7 @@ export default class VieillePieBot extends Client {
   constructor() {
     super({
       presence: { status: 'online' },
-      intents: IntentsBitField.Flags.Guilds | IntentsBitField.Flags.GuildMembers | IntentsBitField.Flags.GuildMessages
+      intents: IntentsBitField.Flags.GuildMembers | IntentsBitField.Flags.GuildMessages
     });
 
     this.msgTodayManager = new MessageTodayManager(this);
