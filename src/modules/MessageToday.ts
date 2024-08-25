@@ -184,7 +184,7 @@ export default class MessageTodayManager {
     private async _fetchNews(topic: 'world' | 'technology') {
         try {
             const response = await fetch(
-                `https://gnews.io/api/v4/top-headlines?token=${process.env.gnews_token}&topic=${topic}&lang=fr&country=fr,ch,ca&max=5`
+                `https://gnews.io/api/v4/top-headlines?token=${process.env.GNEWS_TOKEN}&topic=${topic}&lang=fr&country=fr,ch,ca&max=5`
             );
             const { articles }= await response.json() as NewsInterface;
 
@@ -259,7 +259,7 @@ export default class MessageTodayManager {
     private async _getWeatherData(cityId: number) {
         try {
             const response = await fetch(
-                `https://api.openweathermap.org/data/2.5/weather?id=${cityId}&APPID=${process.env.weather_token}&lang=fr&units=metric`
+                `https://api.openweathermap.org/data/2.5/weather?id=${cityId}&APPID=${process.env.WEATHER_TOKEN}&lang=fr&units=metric`
             );
             return response.json() as Promise<WeatherData>;
         } catch (error) {
