@@ -109,8 +109,8 @@ export default class MessageTodayManager {
     public async init() {
         registerFont(path.join(__dirname, '../assets/fonts/Roboto-Bold.ttf'), { family: 'Roboto' });
 
-        // At 7h00
-        scheduleJob('0 7 * * *', async () => {
+        // At 6h00
+        scheduleJob('0 6 * * *', async () => {
             await this.run();
         });
     }
