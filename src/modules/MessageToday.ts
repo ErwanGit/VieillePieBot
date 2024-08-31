@@ -5,6 +5,7 @@ import type { APIEmbed } from 'discord-api-types/v10';
 import type { Guild, GuildMember, TextChannel } from 'discord.js';
 import { scheduleJob } from 'node-schedule';
 
+import { truncateString } from 'utils/string';
 import holidays from '../assets/holidays.json';
 import weatherLocation from '../assets/msgtoday/location.json';
 import { birthdayRole, guildId, msgTodayChannel } from '../utils/constants';
@@ -139,14 +140,14 @@ export default class MessageTodayManager {
                         {
                             name: '📰 Actualités dans le monde',
                             value: globalNews
-                                ? globalNews.map((news) => `● [${news.title}](${news.url})`).join('\n')
+                                ? globalNews.map((news) => `● [${truncateString(news.title, 70)}](${news.url})`).join('\n')
                                 : "<:SodSs_Peur:673486362191724544> Les articles dans le monde n'ont pas été recupérés suite à une erreur.",
                             inline: true
                         },
                         {
                             name: '💻 Actualités Tech',
                             value: techNews
-                                ? techNews.map((news) => `● [${news.title}](${news.url})`).join('\n')
+                                ? techNews.map((news) => `● [${truncateString(news.title, 70)}](${news.url})`).join('\n')
                                 : "<:SodSs_Peur:673486362191724544> Les articles technologiques n'ont pas été recupérés suite à une erreur.",
                             inline: true
                         }
