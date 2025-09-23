@@ -1,11 +1,11 @@
 import Bot from '../Bot';
 
 import dayjs from 'dayjs';
-import type { APIEmbed } from 'discord-api-types/v10';
-import type { Guild, GuildMember, TextChannel } from 'discord.js';
+import { ComponentType, MessageFlags } from 'discord-api-types/v10';
+import type { BaseMessageOptions, Guild, GuildMember, TextChannel } from 'discord.js';
 import { scheduleJob } from 'node-schedule';
 
-import { truncateString } from 'utils/string';
+import { truncateString } from '../utils/string';
 import holidays from '../assets/holidays.json';
 import weatherLocation from '../assets/msgtoday/location.json';
 import { birthdayRole, guildId, msgTodayChannel } from '../utils/constants';
@@ -130,41 +130,58 @@ export default class MessageTodayManager {
         const weatherImage = await this._generateImage();
 
         return channel.send({
-            embeds: [
+            components: [
                 {
-                    title: '<:YB_Coucou:701523534094139433> Bonjour à tous !',
-                    description: `Nous sommes aujourd'hui le **${dayjs().format(
-                        'dddd D MMMM YYYY'
-                    )}** et nous fêtons les **${todayFete}** !`,
-                    fields: [
+                    type: ComponentType.Container,
+                    accent_color: 0x5865f2,
+                    components: [
                         {
-                            name: '📰 Actualités dans le monde',
-                            value: globalNews
-                                ? globalNews.map((news) => `● [${truncateString(news.title, 70)}](${news.url})`).join('\n')
-                                : "<:SodSs_Peur:673486362191724544> Les articles dans le monde n'ont pas été recupérés suite à une erreur.",
-                            inline: true
+                            type: ComponentType.TextDisplay,
+                            content: [
+                                '# <:YB_Coucou:701523534094139433> Bonjour à tous !',
+                                `Nous sommes aujourd'hui le **${dayjs().format('dddd D MMMM YYYY')}** et nous fêtons les **${todayFete}** !`,
+                            ].join('\n'),
                         },
                         {
-                            name: '💻 Actualités Tech',
-                            value: techNews
+                            type: ComponentType.TextDisplay,
+                            content: [
+                                '### 📰 Actualités dans le monde',
+                                globalNews
+                                ? globalNews.map((news) => `● [${truncateString(news.title, 70)}](${news.url})`).join('\n')
+                                : "<:SodSs_Peur:673486362191724544> Les articles dans le monde n'ont pas été recupérés suite à une erreur."
+                            ].join('\n'),
+                        },
+                        {
+                            type: ComponentType.TextDisplay,
+                            content: [
+                                '### 💻 Actualités Tech',
+                                techNews
                                 ? techNews.map((news) => `● [${truncateString(news.title, 70)}](${news.url})`).join('\n')
-                                : "<:SodSs_Peur:673486362191724544> Les articles technologiques n'ont pas été recupérés suite à une erreur.",
-                            inline: true
+                                : "<:SodSs_Peur:673486362191724544> Les articles technologiques n'ont pas été recupérés suite à une erreur."
+                            ].join('\n'),
+                        },
+                        {
+                            type: ComponentType.MediaGallery,
+                            items: [{ 
+                                media: { url: 'attachment://weather.png' },
+                                description: `Carte météo du ${dayjs().format('dddd D MMMM YYYY')}.`
+                            }]
                         }
                     ],
-                    color: 0x5865f2,
-                    timestamp: !birthdayMembers && new Date().toISOString(),
-                    footer: !birthdayMembers && { text: guild.name, icon_url: guild.iconURL() ?? undefined },
-                    image: { url: 'attachment://weather.png' }
                 },
-                birthdayMembers && {
-                    title: '🎉 Anniversaire',
-                    description: `Souhaitez un joyeux anniversaire à ${birthdayMembers}.`,
-                    color: 0xea45bc,
-                    timestamp: new Date().toISOString(),
-                    footer: { text: guild.name, icon_url: guild.iconURL() ?? undefined }
-                }
-            ].filter(Boolean) as APIEmbed[],
+                birthdayMembers ? {
+                    type: ComponentType.Container,
+                    accent_color: 0xea45bc,
+                    components: [{
+                        type: ComponentType.TextDisplay,
+                        content: [
+                            '## 🎉 Anniversaire',
+                            `Souhaitez un joyeux anniversaire à ${birthdayMembers} !`
+                        ].join('\n')
+                    }]
+                } : undefined
+            ].filter(Boolean) as BaseMessageOptions['components'],
+            flags: MessageFlags.IsComponentsV2,
             files: [{ attachment: weatherImage, name: 'weather.png' }]
         });
     }
