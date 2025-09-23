@@ -13,7 +13,7 @@ export default class VieillePieBot extends Client {
 
     this.msgTodayManager = new MessageTodayManager(this);
 
-    this.once('ready', (client) => {
+    this.once('clientReady', (client) => {
       console.log(`[${client.user.username}] Bot connecté !`);
 
       this.msgTodayManager.init();

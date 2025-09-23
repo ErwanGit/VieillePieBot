@@ -1,4 +1,3 @@
-version: '3'
 services:
   bot:
     container_name: vp_bot
@@ -10,7 +9,13 @@ services:
     env_file:
       - ./.env
     environment:
-      - env_type=production
+      - TOKEN=${TOKEN}
+      - GNEWS_TOKEN=${GNEWS_TOKEN}
+      - WEATHER_TOKEN=${WEATHER_TOKEN}
+      - GUILD_ID=${GUILD_ID}
+      - MSG_TODAY_CHANNEL=${MSG_TODAY_CHANNEL}
+      - BIRTHDAY_ROLE=${BIRTHDAY_ROLE}
+      - ENV_TYPE=production
       - TZ=Europe/Paris
     networks:
       - global

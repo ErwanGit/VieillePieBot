@@ -1,13 +1,10 @@
-FROM node:20-buster-slim as base
+FROM node:22-alpine AS base
 
 WORKDIR /app
 
-RUN apt-get update && \
-    apt-get upgrade -y --no-install-recommends && \
-    apt-get install -y --no-install-recommends wget ca-certificates build-essential python3 fontconfig ttf-bitstream-vera dumb-init
-
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk update && \
+    apk upgrade && \
+    apk add --no-cache wget ca-certificates build-base python3 fontconfig ttf-bitstream-vera dumb-init cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
 
 ENV TZ Europe/Paris
 

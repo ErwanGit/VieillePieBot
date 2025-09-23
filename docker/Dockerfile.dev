@@ -1,4 +1,4 @@
-FROM node:20-buster-slim as base
+FROM node:22-alpine AS base
 
 ARG BUILDARCH
 
@@ -8,15 +8,21 @@ ENV TZ Europe/Paris
 
 FROM base AS node-amd64
 
-RUN apt-get update && \
-    apt-get upgrade -y --no-install-recommends && \
-    apt-get install -y --no-install-recommends ca-certificates build-essential python3 fontconfig ttf-bitstream-vera dumb-init
+RUN apk update && \
+    apk upgrade && \
+    apk add --no-cache wget ca-certificates build-base python3 fontconfig ttf-bitstream-vera dumb-init
 
 FROM base AS node-arm64
 
-RUN apt-get update && \
-    apt-get upgrade -y --no-install-recommends && \
-    apt-get install -y --no-install-recommends ca-certificates build-essential python3 fontconfig ttf-bitstream-vera dumb-init libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+RUN apk update && \
+    apk upgrade && \
+    apk add --no-cache \
+        # node-gyp
+        libstdc++ build-base python3 make g++ gcc pkgconfig \
+        # Canvas (dev version)
+        pixman-dev cairo-dev pango-dev libjpeg-turbo-dev giflib-dev librsvg-dev \
+        # Canvas (runtime version)
+        pixman cairo pango libjpeg-turbo giflib librsvg gcompat
 
 FROM node-${BUILDARCH} AS final
 
