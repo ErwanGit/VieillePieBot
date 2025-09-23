@@ -4,7 +4,13 @@ WORKDIR /app
 
 RUN apk update && \
     apk upgrade && \
-    apk add --no-cache wget ca-certificates build-base python3 fontconfig ttf-bitstream-vera dumb-init cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
+    apk add --no-cache \
+        # node-gyp
+        libstdc++ build-base python3 make g++ gcc pkgconfig \
+        # Canvas (dev version)
+        pixman-dev cairo-dev pango-dev libjpeg-turbo-dev giflib-dev librsvg-dev \
+        # Canvas (runtime version)
+        pixman cairo pango libjpeg-turbo giflib librsvg gcompat
 
 ENV TZ Europe/Paris
 
