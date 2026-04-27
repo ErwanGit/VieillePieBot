@@ -1,5 +1,10 @@
 FROM node:22-alpine AS base
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
+RUN corepack enable
+
 WORKDIR /app
 
 RUN apk update && \
@@ -14,9 +19,9 @@ RUN apk update && \
 
 ENV TZ Europe/Paris
 
-COPY --chown=node:node package.json yarn.lock ./
+COPY --chown=node:node package.json pnpm-lock.yaml ./
 
-RUN yarn install
+RUN pnpm install
 
 COPY --chown=node:node ./src ./src
 COPY --chown=node:node tsconfig.json ./

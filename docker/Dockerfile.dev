@@ -1,18 +1,15 @@
 FROM node:22-alpine AS base
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
+RUN corepack enable
+
 ARG BUILDARCH
 
 WORKDIR /app
 
 ENV TZ Europe/Paris
-
-FROM base AS node-amd64
-
-RUN apk update && \
-    apk upgrade && \
-    apk add --no-cache wget ca-certificates build-base python3 fontconfig ttf-bitstream-vera dumb-init
-
-FROM base AS node-arm64
 
 RUN apk update && \
     apk upgrade && \
@@ -26,10 +23,10 @@ RUN apk update && \
 
 FROM node-${BUILDARCH} AS final
 
-COPY --chown=node:node package.json yarn.lock ./
+COPY --chown=node:node package.json pnpm-lock.yaml ./
 COPY --chown=node:node tsconfig.json ./
 
-RUN yarn install
+RUN pnpm install
 
 COPY --chown=node:node ./src ./src
 COPY --chown=node:node ./src/assets ./dist/assets
