@@ -194,8 +194,13 @@ export default class MessageTodayManager {
     }
 
     private async _getNews() {
-        const globalNews = await this._fetchNews('world');
-        const techNews = await this._fetchNews('technology');
+        const [globalNews, techNews] = await Promise.all([
+            this._fetchNews('world'),
+            // Ratelimit sinon
+            new Promise((resolve) => setTimeout(resolve, 3_000)).then(() =>
+                this._fetchNews('technology')
+            )
+        ]);
         return { globalNews, techNews };
     }
 
@@ -204,7 +209,7 @@ export default class MessageTodayManager {
             const response = await fetch(
                 `https://gnews.io/api/v4/top-headlines?token=${process.env.GNEWS_TOKEN}&topic=${topic}&lang=fr&country=fr,ch,ca&max=5`
             );
-            const { articles }= await response.json() as NewsInterface;
+            const { articles } = await response.json() as NewsInterface;
 
             const filtredArticles: Array<ArticleInterface> = [];
             for (const article of articles) {
