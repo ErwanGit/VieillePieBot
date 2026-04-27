@@ -17,8 +17,3 @@ services:
       - BIRTHDAY_ROLE=${BIRTHDAY_ROLE}
       - ENV_TYPE=production
       - TZ=Europe/Paris
-    networks:
-      - global
-
-networks:
-  global:

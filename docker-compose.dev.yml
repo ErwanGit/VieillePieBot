@@ -18,11 +18,6 @@ services:
       - BIRTHDAY_ROLE=${BIRTHDAY_ROLE}
       - ENV_TYPE=development
       - TZ=Europe/Paris
-    networks:
-      - global_dev
 
 volumes:
   data:
-
-networks:
-  global_dev:
