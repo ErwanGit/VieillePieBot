@@ -1,35 +1,45 @@
-FROM node:22-alpine AS base
+ARG ALPINE_VERSION=3.22
+
+FROM node:22.21-alpine${ALPINE_VERSION} AS base
+
+ARG BUILDARCH
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
 RUN corepack enable
 
-ARG BUILDARCH
+ENV TZ=Europe/Paris
 
 WORKDIR /app
 
-ENV TZ Europe/Paris
+FROM base AS node-amd64
 
-RUN apk update && \
-    apk upgrade && \
-    apk add --no-cache \
-        # node-gyp
-        libstdc++ build-base python3 make g++ gcc pkgconfig \
-        # Canvas (dev version)
-        pixman-dev cairo-dev pango-dev libjpeg-turbo-dev giflib-dev librsvg-dev \
-        # Canvas (runtime version)
-        pixman cairo pango libjpeg-turbo giflib librsvg gcompat
+RUN apk add --no-cache \
+    wget ca-certificates build-base python3 fontconfig ttf-bitstream-vera dumb-init
+
+FROM base AS node-arm64
+
+RUN apk add --no-cache \
+    dumb-init \
+    # node-gyp
+    libstdc++ build-base python3 make g++ gcc pkgconfig \
+    # Canvas (dev version)
+    pixman-dev cairo-dev pango-dev libjpeg-turbo-dev giflib-dev librsvg-dev \
+    # Canvas (runtime version)
+    pixman cairo pango libjpeg-turbo giflib librsvg gcompat
 
 FROM node-${BUILDARCH} AS final
 
-COPY --chown=node:node package.json pnpm-lock.yaml ./
-COPY --chown=node:node tsconfig.json ./
+COPY package.json pnpm-lock.yaml ./
+COPY tsconfig.json ./
 
-RUN pnpm install
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
-COPY --chown=node:node ./src ./src
-COPY --chown=node:node ./src/assets ./dist/assets
-COPY --chown=node:node .env .
+COPY ./src ./src
+COPY ./src/assets ./dist/assets
+COPY .env .
 
-CMD npx tsc-watch --onSuccess "node dist/index.js"
+ENTRYPOINT ["dumb-init", "--"]
+
+CMD ["pnpm", "exec", "tsc-watch", "--onSuccess", "node dist/index.js"]

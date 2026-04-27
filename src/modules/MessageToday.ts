@@ -242,26 +242,26 @@ export default class MessageTodayManager {
         context.font = '60px Roboto';
         context.fillStyle = '#ffffff';
 
-        const backgroundImage = await loadImage('./src/assets/msgtoday/carte.png');
+        const backgroundImage = await loadImage(path.join(__dirname, '../assets/msgtoday/carte.png'));
         const weatherIcons = {
-            '01d': await loadImage('./src/assets/msgtoday/icons/01d.png'),
-            '01n': await loadImage('./src/assets/msgtoday/icons/01n.png'),
-            '02d': await loadImage('./src/assets/msgtoday/icons/02d.png'),
-            '02n': await loadImage('./src/assets/msgtoday/icons/02n.png'),
-            '03d': await loadImage('./src/assets/msgtoday/icons/03d.png'),
-            '03n': await loadImage('./src/assets/msgtoday/icons/03n.png'),
-            '04d': await loadImage('./src/assets/msgtoday/icons/04d.png'),
-            '04n': await loadImage('./src/assets/msgtoday/icons/04n.png'),
-            '09d': await loadImage('./src/assets/msgtoday/icons/09d.png'),
-            '09n': await loadImage('./src/assets/msgtoday/icons/09n.png'),
-            '10d': await loadImage('./src/assets/msgtoday/icons/10d.png'),
-            '10n': await loadImage('./src/assets/msgtoday/icons/10n.png'),
-            '11d': await loadImage('./src/assets/msgtoday/icons/11d.png'),
-            '11n': await loadImage('./src/assets/msgtoday/icons/11n.png'),
-            '13d': await loadImage('./src/assets/msgtoday/icons/13d.png'),
-            '13n': await loadImage('./src/assets/msgtoday/icons/13n.png'),
-            '50d': await loadImage('./src/assets/msgtoday/icons/11d.png'),
-            '50n': await loadImage('./src/assets/msgtoday/icons/50n.png')
+            '01d': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/01d.png')),
+            '01n': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/01n.png')),
+            '02d': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/02d.png')),
+            '02n': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/02n.png')),
+            '03d': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/03d.png')),
+            '03n': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/03n.png')),
+            '04d': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/04d.png')),
+            '04n': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/04n.png')),
+            '09d': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/09d.png')),
+            '09n': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/09n.png')),
+            '10d': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/10d.png')),
+            '10n': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/10n.png')),
+            '11d': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/11d.png')),
+            '11n': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/11n.png')),
+            '13d': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/13d.png')),
+            '13n': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/13n.png')),
+            '50d': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/11d.png')),
+            '50n': await loadImage(path.join(__dirname, '../assets/msgtoday/icons/50n.png'))
         };
 
         context.drawImage(backgroundImage, 0, 0, 2048, 1365);

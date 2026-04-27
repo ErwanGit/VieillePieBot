@@ -1,34 +1,69 @@
-FROM node:22-alpine AS base
+ARG ALPINE_VERSION=3.22
+
+########
+# Base #
+########
+
+FROM node:22.21-alpine${ALPINE_VERSION} AS base
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
 RUN corepack enable
 
+ENV TZ=Europe/Paris
+
 WORKDIR /app
 
-RUN apk update && \
-    apk upgrade && \
-    apk add --no-cache \
-        # node-gyp
-        libstdc++ build-base python3 make g++ gcc pkgconfig \
-        # Canvas (dev version)
-        pixman-dev cairo-dev pango-dev libjpeg-turbo-dev giflib-dev librsvg-dev \
-        # Canvas (runtime version)
-        pixman cairo pango libjpeg-turbo giflib librsvg gcompat
+RUN apk add --no-cache \
+    # to run as PID 1
+    dumb-init \
+    # node-gyp
+    libstdc++ build-base python3 make g++ gcc pkgconfig \
+    # Canvas (dev version)
+    pixman-dev cairo-dev pango-dev libjpeg-turbo-dev giflib-dev librsvg-dev \
+    # Canvas (runtime version)
+    pixman cairo pango libjpeg-turbo giflib librsvg gcompat
 
-ENV TZ Europe/Paris
+COPY package.json pnpm-lock.yaml ./
 
-COPY --chown=node:node package.json pnpm-lock.yaml ./
+ENTRYPOINT ["dumb-init", "--"]
 
-RUN pnpm install
+###########
+# Builder #
+###########
 
-COPY --chown=node:node ./src ./src
-COPY --chown=node:node tsconfig.json ./
+FROM base AS builder
 
-RUN npx tsc
+ENV NODE_ENV="development"
 
-COPY --chown=node:node .env .
-COPY --chown=node:node ./src/assets ./dist/assets
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
-CMD node dist/index.js
+COPY tsconfig.json ./
+COPY ./src ./src
+
+RUN pnpm exec tsc
+
+COPY ./src/assets ./dist/assets
+
+###########################
+# Production dependencies #
+###########################
+
+FROM base AS prod-deps
+
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod
+
+##############
+# Production #
+##############
+
+FROM base AS production
+
+ENV NODE_ENV="production"
+
+COPY --from=builder /app/dist ./dist
+COPY --from=prod-deps /app/node_modules ./node_modules
+COPY .env ./
+
+CMD ["node", "dist/index.js"]
